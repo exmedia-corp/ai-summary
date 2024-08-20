@@ -4,11 +4,33 @@
 BACKLOG_SPACE="${BACKLOG_SPACE}"
 API_KEY="${BACKLOG_API_KEY}"
 
-# 取得する件数を設定（デフォルトは10件）
-COUNT=${1:-10}  # 引数が指定されていればそれを使用、なければデフォルトの10を使用
-
 # APIエンドポイント
 ENDPOINT="https://${BACKLOG_SPACE}.backlog.com/api/v2/space/activities"
+
+# オプションを指定
+COUNT=100
+PROJECT_KEY=""
+
+# オプションを解析
+while getopts ":c:p:" opt; do
+    case ${opt} in
+        c )
+            COUNT=$OPTARG
+            ;;
+        p )
+            PROJECT_KEY=$OPTARG
+            ;;
+        \? )
+            echo "Invalid option: $OPTARG" 1>&2
+            usage
+            ;;
+        : )
+            echo "Option -$OPTARG requires an argument." 1>&2
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND -1))
 
 # type変換の関数
 convert_type() {
@@ -72,4 +94,10 @@ filtered_response=$(echo "$cleaned_response" | jq -r '
         comment: .content.comment.content
     }'
 )
+
+# issueKeyが指定されている場合はフィルタリング
+if [ -n "$PROJECT_KEY" ]; then
+    filtered_response=$(echo "$filtered_response" | jq "select(.issueKey | startswith(\"$PROJECT_KEY\"))")
+fi
+
 echo "$filtered_response" | jq .
