@@ -10,15 +10,19 @@ ENDPOINT="https://${BACKLOG_SPACE}.backlog.com/api/v2/space/activities"
 # オプションを指定
 COUNT=100
 PROJECT_KEY=""
+DATE=$(date -u -v-1w +"%Y-%m-%d")
 
 # オプションを解析
-while getopts ":c:p:" opt; do
+while getopts ":c:p:d:" opt; do
     case ${opt} in
         c )
             COUNT=$OPTARG
             ;;
         p )
             PROJECT_KEY=$OPTARG
+            ;;
+        d )
+            DATE=$(date -u -j -f "%Y-%m-%d" "$OPTARG" +"%Y-%m-%dT%H:%M:%SZ")
             ;;
         \? )
             echo "Invalid option: $OPTARG" 1>&2
@@ -94,6 +98,9 @@ filtered_response=$(echo "$cleaned_response" | jq -r '
         comment: .content.comment.content
     }'
 )
+
+# dateによってフィルタリング
+filtered_response=$(echo "$filtered_response" | jq  "select(.date >= \"$DATE\")")
 
 # issueKeyが指定されている場合はフィルタリング
 if [ -n "$PROJECT_KEY" ]; then
