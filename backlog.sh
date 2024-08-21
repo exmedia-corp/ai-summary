@@ -7,8 +7,8 @@ PROMPT="以下のBacklogのログを元に、その一週間で発生した重�
 また、プロジェクトやタスクの進捗状況、課題解決のプロセスがどのように進行したかについても説明してください。"
 
 # 環境変数からBacklogのスペースIDとAPIキーを取得
-BACKLOG_SPACE="${BACKLOG_SPACE}"
-API_KEY="${BACKLOG_API_KEY}"
+BACKLOG_SPACE=${BACKLOG_SPACE}
+API_KEY=${BACKLOG_API_KEY}
 
 # APIエンドポイント
 ENDPOINT="https://${BACKLOG_SPACE}.backlog.com/api/v2/space/activities"
@@ -113,5 +113,5 @@ if [ -n "$PROJECT_KEY" ]; then
     filtered_response=$(echo "$filtered_response" | jq "select(.issueKey | startswith(\"$PROJECT_KEY\"))")
 fi
 
-echo "$PROMPT\n"
+echo -e "$PROMPT\n"
 echo "$filtered_response" | jq .
