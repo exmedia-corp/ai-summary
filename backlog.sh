@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# AIへ要約を求めるプロンプト
+PROMPT="以下のBacklogのログを元に、その一週間で発生した重要な出来事を要約してください。\
+要約では、時系列ではなく、週単位で発生したイベントをまとめ、各イベントの経緯と結論に至るプロセスを明記してください。\
+各出来事には必ず該当するBacklogの課題番号を含めてください。\
+また、プロジェクトやタスクの進捗状況、課題解決のプロセスがどのように進行したかについても説明してください。"
+
 # 環境変数からBacklogのスペースIDとAPIキーを取得
 BACKLOG_SPACE="${BACKLOG_SPACE}"
 API_KEY="${BACKLOG_API_KEY}"
@@ -107,4 +113,5 @@ if [ -n "$PROJECT_KEY" ]; then
     filtered_response=$(echo "$filtered_response" | jq "select(.issueKey | startswith(\"$PROJECT_KEY\"))")
 fi
 
+echo "$PROMPT\n"
 echo "$filtered_response" | jq .
